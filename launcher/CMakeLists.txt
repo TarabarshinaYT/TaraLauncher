@@ -6,6 +6,18 @@ project(application)
 
 set(CORE_SOURCES
     # LOGIC - Base classes and infrastructure
+    # TaraLauncher - local Minecraft servers
+    servers/PortAllocator.h
+    servers/PortAllocator.cpp
+    servers/ServerConfig.h
+    servers/ServerConfig.cpp
+    servers/ServerManager.h
+    servers/ServerManager.cpp
+    servers/ServerProcess.h
+    servers/ServerProcess.cpp
+    servers/ServerProperties.h
+    servers/ServerProperties.cpp
+
     BaseVersionList.h
     BaseVersionList.cpp
     InstanceList.h
