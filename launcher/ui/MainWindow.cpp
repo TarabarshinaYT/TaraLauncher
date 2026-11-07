@@ -127,6 +127,8 @@
 #include "modplatform/modrinth/ModrinthAPI.h"
 
 #include "KonamiCode.h"
+#include "servers/ServerManager.h"
+#include "ui/ServersWindow.h"
 
 #include "InstanceCopyTask.h"
 #include "InstanceDirUpdate.h"
@@ -257,6 +259,21 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     {  // logs viewing
         connect(ui->actionViewLog, &QAction::triggered, this, [] { APPLICATION->showLogWindow(); });
+    }
+
+    {  // TaraLauncher: local servers window
+        auto* serversAction = new QAction(QIcon::fromTheme("server", QIcon::fromTheme("minecraft")), tr("Серверы"), this);
+        serversAction->setToolTip(tr("Создавать и запускать локальные серверы Minecraft"));
+        ui->mainToolBar->insertAction(ui->actionFoldersButton, serversAction);
+        connect(serversAction, &QAction::triggered, this, [this] {
+            if (!m_serversWindow) {
+                auto* manager = new ServerManager(FS::PathCombine(APPLICATION->dataRoot(), "servers"), this);
+                m_serversWindow = new ServersWindow(manager, this);
+            }
+            m_serversWindow->show();
+            m_serversWindow->raise();
+            m_serversWindow->activateWindow();
+        });
     }
 
     // add the toolbar toggles to the view menu

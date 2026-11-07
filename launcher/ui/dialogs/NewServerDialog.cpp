@@ -10,12 +10,14 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSpinBox>
+#include <QStandardItemModel>
 #include <QVBoxLayout>
 
 #include "Application.h"
 #include "Filter.h"
 #include "meta/Index.h"
 #include "meta/VersionList.h"
+#include "servers/ServerInstaller.h"
 #include "ui/widgets/VersionSelectWidget.h"
 
 NewServerDialog::NewServerDialog(QWidget* parent) : QDialog(parent)
@@ -53,7 +55,17 @@ NewServerDialog::NewServerDialog(QWidget* parent) : QDialog(parent)
         } else if (serverTypeUsesMods(t)) {
             label += tr(" (моды)");
         }
+        const bool supported = ServerInstaller::isSupported(t);
+        if (!supported) {
+            label += tr(" (скоро)");
+        }
         m_type->addItem(label, serverTypeId(t));
+        if (!supported) {
+            // grey out types that cannot be installed yet
+            if (auto* model = qobject_cast<QStandardItemModel*>(m_type->model())) {
+                model->item(m_type->count() - 1)->setEnabled(false);
+            }
+        }
     }
     form->addRow(tr("Тип сервера:"), m_type);
 

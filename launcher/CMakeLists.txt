@@ -11,6 +11,8 @@ set(CORE_SOURCES
     servers/PortAllocator.cpp
     servers/ServerConfig.h
     servers/ServerConfig.cpp
+    servers/ServerInstaller.h
+    servers/ServerInstaller.cpp
     servers/ServerManager.h
     servers/ServerManager.cpp
     servers/ServerProcess.h
@@ -820,6 +822,8 @@ SET(LAUNCHER_SOURCES
     # GUI - windows
     ui/MainWindow.h
     ui/MainWindow.cpp
+    ui/ServersWindow.cpp
+    ui/ServersWindow.h
     ui/InstanceWindow.h
     ui/InstanceWindow.cpp
     ui/ViewLogWindow.h
