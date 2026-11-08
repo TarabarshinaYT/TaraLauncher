@@ -13,6 +13,7 @@
 #include <QObject>
 #include <QTimer>
 
+#include "PlayerHistory.h"
 #include "ServerConfig.h"
 
 class ServerProcess : public QObject {
@@ -42,10 +43,19 @@ class ServerProcess : public QObject {
     /** Console text of the current run (or the tail of the log after reattaching). */
     const QStringList& logLines() const { return m_log; }
 
+    PlayerHistory& history() { return m_history; }
+    const PlayerHistory& history() const { return m_history; }
+
    signals:
     void statusChanged(ServerProcess::Status status);
     void logAppended(const QStringList& lines);
     void failed(const QString& reason);
+    void playerJoined(const QString& name);
+    void playerLeft(const QString& name);
+    /** An ERROR line appeared in the server log (rate limited). */
+    void errorLogged(const QString& line);
+    /** The server process died without being asked to stop. */
+    void crashed();
 
    private slots:
     void poll();
@@ -60,6 +70,8 @@ class ServerProcess : public QObject {
     QString pidFilePath() const;
     QString logFilePath() const;
     void writePidFile() const;
+    void parseEvents(const QStringList& lines);
+    void reconcileOnlinePlayers();
 
     ServerConfig m_config;
     QString m_directory;
@@ -70,4 +82,7 @@ class ServerProcess : public QObject {
     QElapsedTimer m_stopClock;
     QTimer m_poll;
     QStringList m_log;
+    PlayerHistory m_history;
+    QElapsedTimer m_errorClock;
+    bool m_needsReconcile = false;
 };

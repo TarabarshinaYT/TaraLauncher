@@ -245,6 +245,7 @@ class MainWindow : public QMainWindow {
     QLabel* m_statusCenter = nullptr;
     QToolButton* m_changeIconButton = nullptr;
     class ServersWindow* m_serversWindow = nullptr;
+    class ServerManager* m_serverManager = nullptr;
     QAction* m_instanceToolBarTopSeparator = nullptr;
     QAction* m_instanceInfoWidget = nullptr;
     EditableLabel* m_nameLabel = nullptr;

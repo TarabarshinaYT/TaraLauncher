@@ -128,6 +128,7 @@
 
 #include "KonamiCode.h"
 #include "servers/ServerManager.h"
+#include "servers/ServerNotifier.h"
 #include "ui/ServersWindow.h"
 
 #include "InstanceCopyTask.h"
@@ -262,13 +263,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     }
 
     {  // TaraLauncher: local servers window
+        // created at start, not on first click: servers that keep running must still send notifications
+        m_serverManager = new ServerManager(FS::PathCombine(APPLICATION->dataRoot(), "servers"), this);
+        new ServerNotifier(m_serverManager, this);
         auto* serversAction = new QAction(QIcon::fromTheme("server", QIcon::fromTheme("minecraft")), tr("Серверы"), this);
         serversAction->setToolTip(tr("Создавать и запускать локальные серверы Minecraft"));
         ui->mainToolBar->insertAction(ui->actionFoldersButton, serversAction);
         connect(serversAction, &QAction::triggered, this, [this] {
             if (!m_serversWindow) {
-                auto* manager = new ServerManager(FS::PathCombine(APPLICATION->dataRoot(), "servers"), this);
-                m_serversWindow = new ServersWindow(manager, this);
+                m_serversWindow = new ServersWindow(m_serverManager, this);
             }
             m_serversWindow->show();
             m_serversWindow->raise();

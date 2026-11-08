@@ -36,6 +36,10 @@ void ServerManager::attach(ServerProcess* server)
     m_servers.push_back(server);
     connect(server, &ServerProcess::statusChanged, this,
             [this, server](ServerProcess::Status status) { emit serverStatusChanged(server, status); });
+    connect(server, &ServerProcess::playerJoined, this, [this, server](const QString& name) { emit playerJoined(server, name); });
+    connect(server, &ServerProcess::playerLeft, this, [this, server](const QString& name) { emit playerLeft(server, name); });
+    connect(server, &ServerProcess::crashed, this, [this, server] { emit serverCrashed(server); });
+    connect(server, &ServerProcess::errorLogged, this, [this, server](const QString& line) { emit serverErrorLogged(server, line); });
     emit serverAdded(server);
 }
 

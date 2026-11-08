@@ -3,7 +3,10 @@
 
 #include <QFile>
 #include <QHBoxLayout>
+#include <QAction>
 #include <QLabel>
+#include <QMenu>
+#include <QToolButton>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMessageBox>
@@ -17,6 +20,7 @@
 #include "servers/ServerInstaller.h"
 #include "servers/ServerJavaTask.h"
 #include "servers/ServerManager.h"
+#include "servers/ServerNotifier.h"
 #include "ui/dialogs/NewServerDialog.h"
 #include "ui/dialogs/ProgressDialog.h"
 #include "ui/dialogs/ServerSettingsDialog.h"
@@ -59,6 +63,23 @@ ServersWindow::ServersWindow(ServerManager* manager, QWidget* parent) : QWidget(
     row2->addWidget(m_folder);
     row2->addWidget(HelpIcon::wrap(m_delete, tr("Удаляет сервер вместе с миром и всеми файлами. Отменить нельзя, сделайте резервную копию заранее."), this));
     left->addLayout(row2);
+    // notifications: which events produce a system notification
+    auto* notifyButton = new QToolButton(this);
+    notifyButton->setText(tr("Уведомления"));
+    notifyButton->setPopupMode(QToolButton::InstantPopup);
+    auto* notifyMenu = new QMenu(notifyButton);
+    auto addToggle = [&](const QString& text, bool (*get)(), void (*set)(bool)) {
+        QAction* action = notifyMenu->addAction(text);
+        action->setCheckable(true);
+        action->setChecked(get());
+        connect(action, &QAction::toggled, this, [set](bool on) { set(on); });
+    };
+    addToggle(tr("Игрок зашёл на сервер"), &ServerNotifier::joinEnabled, &ServerNotifier::setJoinEnabled);
+    addToggle(tr("Сервер упал"), &ServerNotifier::crashEnabled, &ServerNotifier::setCrashEnabled);
+    addToggle(tr("Ошибка в журнале сервера"), &ServerNotifier::errorEnabled, &ServerNotifier::setErrorEnabled);
+    notifyButton->setMenu(notifyMenu);
+    left->addWidget(HelpIcon::wrap(notifyButton, tr("Показывать системные уведомления (в Windows это всплывающие окошки в углу экрана) о событиях на серверах. Работает и когда окно серверов закрыто, пока запущен лаунчер."), this));
+
     m_warning = new QLabel(this);
     m_warning->setWordWrap(true);
     left->addWidget(m_warning);

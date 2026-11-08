@@ -7,6 +7,8 @@ project(application)
 set(CORE_SOURCES
     # LOGIC - Base classes and infrastructure
     # TaraLauncher - local Minecraft servers
+    servers/PlayerHistory.h
+    servers/PlayerHistory.cpp
     servers/PortAllocator.h
     servers/PortAllocator.cpp
     servers/RconClient.h
@@ -19,6 +21,8 @@ set(CORE_SOURCES
     servers/ServerInstaller.cpp
     servers/ServerManager.h
     servers/ServerManager.cpp
+    servers/ServerNotifier.h
+    servers/ServerNotifier.cpp
     servers/ServerProcess.h
     servers/ServerProcess.cpp
     servers/ServerProperties.h
@@ -1086,6 +1090,8 @@ SET(LAUNCHER_SOURCES
     ui/widgets/HelpIcon.cpp
     ui/widgets/HelpIcon.h
     ui/widgets/MotdPreview.cpp
+    ui/widgets/PlayersTab.cpp
+    ui/widgets/PlayersTab.h
     ui/widgets/MotdPreview.h
     ui/widgets/ServerPropertiesEditor.cpp
     ui/widgets/ServerPropertiesEditor.h

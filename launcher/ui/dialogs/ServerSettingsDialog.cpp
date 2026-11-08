@@ -18,6 +18,7 @@
 
 #include "servers/ServerManager.h"
 #include "ui/widgets/HelpIcon.h"
+#include "ui/widgets/PlayersTab.h"
 #include "ui/widgets/ServerPropertiesEditor.h"
 
 ServerSettingsDialog::ServerSettingsDialog(ServerManager* manager, ServerProcess* server, QWidget* parent)
@@ -35,6 +36,7 @@ ServerSettingsDialog::ServerSettingsDialog(ServerManager* manager, ServerProcess
     m_properties = new ServerPropertiesEditor(server->config().name, this);
     m_properties->load(QDir(server->directory()).filePath(QStringLiteral("server.properties")));
     m_tabs->addTab(m_properties, tr("server.properties"));
+    m_tabs->addTab(new PlayersTab(server, this), tr("Игроки"));
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Close, this);
     buttons->button(QDialogButtonBox::Save)->setText(tr("Сохранить"));

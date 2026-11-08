@@ -696,6 +696,10 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 
         // Folders
         m_settings->registerSetting("InstanceDir", "instances");
+        // TaraLauncher: server notifications
+        m_settings->registerSetting("ServerNotifyJoin", true);
+        m_settings->registerSetting("ServerNotifyCrash", true);
+        m_settings->registerSetting("ServerNotifyError", false);
         m_settings->registerSetting("AdditionalInstanceDirs", QVariant(QStringList()));
         m_settings->registerSetting("LastUsedInstDirForNewInstance", "");
         m_settings->registerSetting({ "CentralModsDir", "ModsDir" }, "mods");

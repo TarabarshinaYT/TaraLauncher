@@ -3,7 +3,9 @@
 
 #include <QDir>
 #include <QFile>
+#include <QDateTime>
 #include <QProcess>
+#include <QRegularExpression>
 #include <QStandardPaths>
 
 #include "PortAllocator.h"
@@ -60,7 +62,7 @@ void killPid(qint64 pid)
 }  // namespace
 
 ServerProcess::ServerProcess(const ServerConfig& config, const QString& directory, QObject* parent)
-    : QObject(parent), m_config(config), m_directory(directory)
+    : QObject(parent), m_config(config), m_directory(directory), m_history(directory)
 {
     m_poll.setInterval(kPollMs);
     connect(&m_poll, &QTimer::timeout, this, &ServerProcess::poll);
@@ -81,10 +83,15 @@ ServerProcess::ServerProcess(const ServerConfig& config, const QString& director
                 m_log = QString::fromUtf8(log.readAll()).split('\n', Qt::SkipEmptyParts);
                 m_logOffset = size;
             }
+            m_needsReconcile = true;  // who is online right now? asked through RCON on the first poll
             m_poll.start();
         } else {
             QFile::remove(pidFilePath());
         }
+    }
+    if (m_status == Status::Stopped) {
+        // sessions left open mean the server ended while the launcher was closed (or the PC was switched off)
+        m_history.closeAll(QDateTime::currentDateTime());
     }
 }
 
@@ -293,10 +300,62 @@ void ServerProcess::readNewLog()
         }
     }
     appendLines(lines);
+    parseEvents(lines);
+}
+
+void ServerProcess::parseEvents(const QStringList& lines)
+{
+    // "[12:00:00] [Server thread/INFO]: Steve joined the game" (vanilla, Fabric) and
+    // "[12:00:00 INFO]: Steve joined the game" (Paper). The name must directly follow "]: ",
+    // so chat messages like "<Steve> joined the game" do not match.
+    static const QRegularExpression presence(QStringLiteral("\\]: ([A-Za-z0-9_.]{1,32}) (joined|left) the game\\s*$"));
+    static const QRegularExpression errorLine(QStringLiteral("(/ERROR\\]|\\sERROR\\]):"));
+    const QDateTime now = QDateTime::currentDateTime();
+    for (const QString& line : lines) {
+        const auto m = presence.match(line);
+        if (m.hasMatch()) {
+            const QString name = m.captured(1);
+            if (m.captured(2) == QLatin1String("joined")) {
+                m_history.playerJoined(name, now);
+                emit playerJoined(name);
+            } else {
+                m_history.playerLeft(name, now);
+                emit playerLeft(name);
+            }
+            continue;
+        }
+        if (errorLine.match(line).hasMatch()) {
+            // at most one error notification per minute, a crash can print hundreds of lines
+            if (!m_errorClock.isValid() || m_errorClock.elapsed() > 60000) {
+                m_errorClock.start();
+                emit errorLogged(line);
+            }
+        }
+    }
+}
+
+void ServerProcess::reconcileOnlinePlayers()
+{
+    QString reply, error;
+    if (!Rcon::send(m_config.rconPort, m_config.rconPassword, QStringLiteral("list"), &reply, &error)) {
+        return;
+    }
+    QStringList online;
+    for (const QString& name : m_history.onlineNames()) {
+        const QRegularExpression word(QStringLiteral("(^|[^A-Za-z0-9_.])%1($|[^A-Za-z0-9_.])").arg(QRegularExpression::escape(name)));
+        if (word.match(reply).hasMatch()) {
+            online << name;
+        }
+    }
+    m_history.keepOnly(online, QDateTime::currentDateTime());
 }
 
 void ServerProcess::poll()
 {
+    if (m_needsReconcile && m_status == Status::Running) {
+        m_needsReconcile = false;
+        reconcileOnlinePlayers();
+    }
     readNewLog();
 
     if (!pidAlive(m_pid)) {
@@ -305,7 +364,11 @@ void ServerProcess::poll()
         QFile::remove(pidFilePath());
         m_pid = 0;
         const bool expected = m_stopRequested || m_status == Status::Stopping;
+        m_history.closeAll(QDateTime::currentDateTime());
         setStatus(expected ? Status::Stopped : Status::Crashed);
+        if (!expected) {
+            emit crashed();
+        }
         return;
     }
     if (m_status == Status::Stopping && m_stopClock.isValid() && m_stopClock.elapsed() > kStopTimeoutMs) {

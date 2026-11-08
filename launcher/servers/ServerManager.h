@@ -52,6 +52,10 @@ class ServerManager : public QObject {
     void serverAdded(ServerProcess* server);
     void serverRemoved(const QString& id);
     void serverStatusChanged(ServerProcess* server, ServerProcess::Status status);
+    void playerJoined(ServerProcess* server, const QString& name);
+    void playerLeft(ServerProcess* server, const QString& name);
+    void serverCrashed(ServerProcess* server);
+    void serverErrorLogged(ServerProcess* server, const QString& line);
 
    private:
     void attach(ServerProcess* server);
