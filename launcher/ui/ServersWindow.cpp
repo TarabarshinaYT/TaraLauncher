@@ -309,7 +309,7 @@ void ServersWindow::restartSelected()
     }
     // start again as soon as the server has really stopped
     auto connection = std::make_shared<QMetaObject::Connection>();
-    *connection = connect(s, &ServerProcess::statusChanged, this, [this, s, connection](ServerProcess::Status status) {
+    *connection = connect(s, &ServerProcess::statusChanged, this, [s, connection](ServerProcess::Status status) {
         if (status == ServerProcess::Status::Stopped || status == ServerProcess::Status::Crashed) {
             QObject::disconnect(*connection);
             s->start();

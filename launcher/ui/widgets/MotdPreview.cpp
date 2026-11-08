@@ -41,7 +41,7 @@ QList<QList<Span>> parse(const QString& text, QChar marker)
 {
     const QColor white(0xFF, 0xFF, 0xFF);
     QList<QList<Span>> lines;
-    lines.append({});
+    lines.emplaceBack();
     Span current;
     current.color = white;
 
@@ -56,7 +56,7 @@ QList<QList<Span>> parse(const QString& text, QChar marker)
         const QChar c = text[i];
         if (c == '\n') {
             flush(current);
-            lines.append({});
+            lines.emplaceBack();
             continue;
         }
         if (c == marker && i + 1 < text.size() && isCode(text[i + 1])) {
