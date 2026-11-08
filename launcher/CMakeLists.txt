@@ -1079,6 +1079,16 @@ SET(LAUNCHER_SOURCES
     ui/dialogs/NewInstanceDialog.h
     ui/dialogs/NewServerDialog.cpp
     ui/dialogs/NewServerDialog.h
+    ui/dialogs/MotdEditorDialog.cpp
+    ui/dialogs/MotdEditorDialog.h
+    ui/dialogs/ServerSettingsDialog.cpp
+    ui/dialogs/ServerSettingsDialog.h
+    ui/widgets/HelpIcon.cpp
+    ui/widgets/HelpIcon.h
+    ui/widgets/MotdPreview.cpp
+    ui/widgets/MotdPreview.h
+    ui/widgets/ServerPropertiesEditor.cpp
+    ui/widgets/ServerPropertiesEditor.h
     ui/dialogs/NewsDialog.cpp
     ui/dialogs/NewsDialog.h
     ui/pagedialog/PageDialog.cpp

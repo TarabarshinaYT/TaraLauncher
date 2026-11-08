@@ -36,6 +36,10 @@ class ServerProperties {
 
     QStringList keys() const;
 
+    /** Java .properties escapes: \uXXXX, \n, \\. Needed for values like the MOTD that contain the section sign. */
+    static QString decodeEscapes(const QString& text);
+    static QString encodeEscapes(const QString& text);
+
    private:
     struct Line {
         QString raw;    // used verbatim for comments and blank lines

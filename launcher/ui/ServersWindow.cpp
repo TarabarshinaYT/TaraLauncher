@@ -19,6 +19,8 @@
 #include "servers/ServerManager.h"
 #include "ui/dialogs/NewServerDialog.h"
 #include "ui/dialogs/ProgressDialog.h"
+#include "ui/dialogs/ServerSettingsDialog.h"
+#include "ui/widgets/HelpIcon.h"
 
 namespace {
 constexpr int kIdRole = Qt::UserRole + 1;
@@ -43,15 +45,19 @@ ServersWindow::ServersWindow(ServerManager* manager, QWidget* parent) : QWidget(
     m_start = new QPushButton(tr("Запустить"), this);
     m_stop = new QPushButton(tr("Остановить"), this);
     m_restart = new QPushButton(tr("Перезапустить"), this);
-    row1->addWidget(m_start);
+    row1->addWidget(HelpIcon::wrap(m_start, tr("Запускает сервер отдельным процессом. Он продолжит работать, даже если закрыть лаунчер. Нужную Java лаунчер найдёт или скачает сам."), this));
     row1->addWidget(m_stop);
-    row1->addWidget(m_restart);
+    row1->addWidget(HelpIcon::wrap(m_restart, tr("Корректно останавливает сервер и запускает его снова, например после смены настроек."), this));
     left->addLayout(row1);
+    // short explanations for the buttons whose effect is not obvious
+    m_stop->setToolTip(tr("Останавливает сервер корректно: сохраняет мир и отключает игроков."));
     auto* row2 = new QHBoxLayout();
+    m_settings = new QPushButton(tr("Настройки"), this);
     m_folder = new QPushButton(tr("Папка"), this);
     m_delete = new QPushButton(tr("Удалить"), this);
+    row2->addWidget(m_settings);
     row2->addWidget(m_folder);
-    row2->addWidget(m_delete);
+    row2->addWidget(HelpIcon::wrap(m_delete, tr("Удаляет сервер вместе с миром и всеми файлами. Отменить нельзя, сделайте резервную копию заранее."), this));
     left->addLayout(row2);
     m_warning = new QLabel(this);
     m_warning->setWordWrap(true);
@@ -74,6 +80,8 @@ ServersWindow::ServersWindow(ServerManager* manager, QWidget* parent) : QWidget(
     connect(m_start, &QPushButton::clicked, this, &ServersWindow::startSelected);
     connect(m_stop, &QPushButton::clicked, this, &ServersWindow::stopSelected);
     connect(m_restart, &QPushButton::clicked, this, &ServersWindow::restartSelected);
+    connect(m_settings, &QPushButton::clicked, this, &ServersWindow::openSettings);
+    connect(m_list, &QListWidget::itemDoubleClicked, this, &ServersWindow::openSettings);
     connect(m_folder, &QPushButton::clicked, this, &ServersWindow::openFolder);
     connect(m_delete, &QPushButton::clicked, this, &ServersWindow::deleteSelected);
     connect(m_command, &QLineEdit::returnPressed, this, &ServersWindow::sendCommand);
@@ -168,6 +176,7 @@ void ServersWindow::updateButtons()
     m_start->setEnabled(has && !active);
     m_stop->setEnabled(active && s->status() != ServerProcess::Status::Stopping);
     m_restart->setEnabled(active);
+    m_settings->setEnabled(has);
     m_folder->setEnabled(has);
     m_delete->setEnabled(has && !active);
     m_command->setEnabled(has && active);
@@ -304,6 +313,17 @@ void ServersWindow::deleteSelected()
     if (!m_manager->remove(s->config().id, &error)) {
         QMessageBox::warning(this, tr("Удалить сервер"), error);
     }
+}
+
+void ServersWindow::openSettings()
+{
+    auto* s = selected();
+    if (!s) {
+        return;
+    }
+    ServerSettingsDialog dialog(m_manager, s, this);
+    dialog.exec();
+    refreshItem(s);
 }
 
 void ServersWindow::openFolder()

@@ -29,6 +29,7 @@ class ServersWindow : public QWidget {
     void restartSelected();
     void deleteSelected();
     void openFolder();
+    void openSettings();
     void sendCommand();
     void selectionChanged();
     void refreshItem(ServerProcess* server);
@@ -49,6 +50,7 @@ class ServersWindow : public QWidget {
     QPushButton* m_start = nullptr;
     QPushButton* m_stop = nullptr;
     QPushButton* m_restart = nullptr;
+    QPushButton* m_settings = nullptr;
     QPushButton* m_folder = nullptr;
     QPushButton* m_delete = nullptr;
 };

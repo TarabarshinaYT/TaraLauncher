@@ -135,3 +135,51 @@ QStringList ServerProperties::keys() const
     }
     return out;
 }
+
+QString ServerProperties::decodeEscapes(const QString& text)
+{
+    QString out;
+    out.reserve(text.size());
+    for (int i = 0; i < text.size(); ++i) {
+        const QChar c = text[i];
+        if (c != '\\' || i + 1 >= text.size()) {
+            out.append(c);
+            continue;
+        }
+        const QChar n = text[++i];
+        if (n == 'n') {
+            out.append('\n');
+        } else if (n == 't') {
+            out.append('\t');
+        } else if (n == 'u' && i + 4 < text.size()) {
+            bool ok = false;
+            const ushort code = text.mid(i + 1, 4).toUShort(&ok, 16);
+            if (ok) {
+                out.append(QChar(code));
+                i += 4;
+            } else {
+                out.append('u');
+            }
+        } else {
+            out.append(n);  // "\\" -> "\", "\:" -> ":" and so on
+        }
+    }
+    return out;
+}
+
+QString ServerProperties::encodeEscapes(const QString& text)
+{
+    QString out;
+    for (const QChar c : text) {
+        if (c == '\\') {
+            out.append(QStringLiteral("\\\\"));
+        } else if (c == '\n') {
+            out.append(QStringLiteral("\\n"));
+        } else if (c.unicode() > 126 || c.unicode() < 32) {
+            out.append(QStringLiteral("\\u%1").arg(c.unicode(), 4, 16, QLatin1Char('0')).toLower());
+        } else {
+            out.append(c);
+        }
+    }
+    return out;
+}
