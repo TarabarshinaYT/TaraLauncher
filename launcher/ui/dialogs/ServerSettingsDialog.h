@@ -14,6 +14,7 @@ class QTabWidget;
 class ServerManager;
 class ServerProcess;
 class ServerPropertiesEditor;
+class ConnectionTab;
 
 class ServerSettingsDialog : public QDialog {
     Q_OBJECT
@@ -38,4 +39,5 @@ class ServerSettingsDialog : public QDialog {
     QLineEdit* m_jvmArgs = nullptr;
     QCheckBox* m_eula = nullptr;
     ServerPropertiesEditor* m_properties = nullptr;
+    ConnectionTab* m_connection = nullptr;
 };

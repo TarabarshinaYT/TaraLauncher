@@ -120,6 +120,7 @@ bool ServerConfig::load(const QString& dir)
     eulaAccepted = o.value("eulaAccepted").toBool(false);
     rconPort = o.value("rconPort").toInt(0);
     rconPassword = o.value("rconPassword").toString();
+    publicAddress = o.value("publicAddress").toString();
     extraJvmArgs.clear();
     for (const auto& v : o.value("extraJvmArgs").toArray()) {
         extraJvmArgs << v.toString();
@@ -146,6 +147,7 @@ bool ServerConfig::save(const QString& dir) const
     o["eulaAccepted"] = eulaAccepted;
     o["rconPort"] = rconPort;
     o["rconPassword"] = rconPassword;
+    o["publicAddress"] = publicAddress;
     o["extraJvmArgs"] = QJsonArray::fromStringList(extraJvmArgs);
     o["launchArgs"] = QJsonArray::fromStringList(launchArgs);
 

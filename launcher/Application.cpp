@@ -60,6 +60,8 @@
 #include "ui/pages/global/APIPage.h"
 #include "ui/pages/global/AccountListPage.h"
 #include "ui/pages/global/AppearancePage.h"
+#include "ui/pages/global/TaraAppearancePage.h"
+#include "ui/TaraAppearance.h"
 #include "ui/pages/global/ExternalToolsPage.h"
 #include "ui/pages/global/JavaPage.h"
 #include "ui/pages/global/LanguagePage.h"
@@ -700,6 +702,16 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("ServerNotifyJoin", true);
         m_settings->registerSetting("ServerNotifyCrash", true);
         m_settings->registerSetting("ServerNotifyError", false);
+        // TaraLauncher: appearance
+        m_settings->registerSetting("TaraPanelOpacity", 45);          // % opacity of panels in the Glass style
+        m_settings->registerSetting("TaraBackgroundEnabled", false);
+        m_settings->registerSetting("TaraBackgroundPath", "");
+        m_settings->registerSetting("TaraBackgroundDim", 35);         // % darkening over the picture
+        m_settings->registerSetting("TaraBackgroundBlur", 0);         // 0..30
+        m_settings->registerSetting("TaraBackgroundMode", "fill");    // fill | fit | stretch | center
+        m_settings->registerSetting("TaraIconPreset", "tara");        // built-in icon name or "custom"
+        m_settings->registerSetting("TaraIconCustomPath", "");
+        m_settings->registerSetting("TaraShortcutPath", "");          // desktop shortcut created by the launcher
         m_settings->registerSetting("AdditionalInstanceDirs", QVariant(QStringList()));
         m_settings->registerSetting("LastUsedInstDirForNewInstance", "");
         m_settings->registerSetting({ "CentralModsDir", "ModsDir" }, "mods");
@@ -927,6 +939,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
             m_globalSettingsProvider->addPage<LauncherPage>();
             m_globalSettingsProvider->addPage<LanguagePage>();
             m_globalSettingsProvider->addPage<AppearancePage>();
+            m_globalSettingsProvider->addPage<TaraAppearancePage>();
             m_globalSettingsProvider->addPage<MinecraftPage>();
             m_globalSettingsProvider->addPage<JavaPage>();
             m_globalSettingsProvider->addPage<AccountListPage>();
@@ -1244,6 +1257,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     if (!createSetupWizard()) {
         m_themeManager->applyCurrentlySelectedTheme(true);
     }
+    TaraAppearance::install();  // background picture and application icon (safe to call more than once)
     performMainStartupAction();
 }
 

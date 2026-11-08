@@ -17,6 +17,7 @@
 #include <QVBoxLayout>
 
 #include "servers/ServerManager.h"
+#include "ui/widgets/ConnectionTab.h"
 #include "ui/widgets/HelpIcon.h"
 #include "ui/widgets/MapTab.h"
 #include "ui/widgets/PlayersTab.h"
@@ -37,6 +38,8 @@ ServerSettingsDialog::ServerSettingsDialog(ServerManager* manager, ServerProcess
     m_properties = new ServerPropertiesEditor(server->config().name, this);
     m_properties->load(QDir(server->directory()).filePath(QStringLiteral("server.properties")));
     m_tabs->addTab(m_properties, tr("server.properties"));
+    m_connection = new ConnectionTab(server, this);
+    m_tabs->addTab(m_connection, tr("Подключение"));
     m_tabs->addTab(new PlayersTab(server, this), tr("Игроки"));
     m_tabs->addTab(new MapTab(server, this), tr("Карта"));
 
@@ -117,6 +120,7 @@ void ServerSettingsDialog::save()
     config.javaPath = m_java->text().trimmed();
     config.extraJvmArgs = QProcess::splitCommand(m_jvmArgs->text());
     config.eulaAccepted = m_eula->isChecked();
+    config.publicAddress = m_connection->publicAddress();
 
     QString error;
     if (!m_manager->saveConfig(config.id, config, &error)) {

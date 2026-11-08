@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 #include "ServersWindow.h"
 
+#include "servers/ServerNetwork.h"
+
 #include <QFile>
 #include <QHBoxLayout>
 #include <QAction>
@@ -33,6 +35,7 @@ constexpr int kIdRole = Qt::UserRole + 1;
 ServersWindow::ServersWindow(ServerManager* manager, QWidget* parent) : QWidget(parent, Qt::Window), m_manager(manager)
 {
     setWindowTitle(tr("Серверы"));
+    setProperty("taraBackground", true);  // lets the background picture show through this window
     resize(980, 600);
 
     auto* root = new QHBoxLayout(this);
@@ -174,10 +177,16 @@ void ServersWindow::refreshItem(ServerProcess* server)
         return;
     }
     const auto& c = server->config();
-    item->setText(tr("%1\n%2 %3 · порт %4 · %5")
-                      .arg(c.name, serverTypeName(c.type), c.minecraftVersion)
-                      .arg(c.port)
-                      .arg(statusText(server->status())));
+    QString address = c.publicAddress.trimmed();
+    if (address.isEmpty()) {
+        const QStringList local = ServerNetwork::localAddresses();
+        address = local.isEmpty() ? QStringLiteral("localhost") : local.first();
+    }
+    if (!address.contains(':') && c.port != 25565) {
+        address += QStringLiteral(":%1").arg(c.port);
+    }
+    item->setText(tr("%1\n%2 %3 · адрес %4 · %5")
+                      .arg(c.name, serverTypeName(c.type), c.minecraftVersion, address, statusText(server->status())));
 }
 
 void ServersWindow::selectionChanged()

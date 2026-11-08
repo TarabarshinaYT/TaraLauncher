@@ -30,6 +30,7 @@
 #include "ui/themes/CatPack.h"
 #include "ui/themes/CustomTheme.h"
 #include "ui/themes/DarkTheme.h"
+#include "ui/themes/TaraThemes.h"
 #include "ui/themes/SystemTheme.h"
 
 #include "Application.h"
@@ -146,6 +147,11 @@ void ThemeManager::initializeWidgets()
     auto darkThemeId = addTheme(std::make_unique<DarkTheme>());
     themeDebugLog() << "Loading Built-in Theme:" << darkThemeId;
     themeDebugLog() << "Loading Built-in Theme:" << addTheme(std::make_unique<BrightTheme>());
+    // TaraLauncher styles
+    addTheme(std::make_unique<TaraTheme>(TaraTheme::Kind::Glass));
+    addTheme(std::make_unique<TaraTheme>(TaraTheme::Kind::Smooth));
+    addTheme(std::make_unique<TaraTheme>(TaraTheme::Kind::Neon));
+    addTheme(std::make_unique<TaraTheme>(TaraTheme::Kind::Minimal));
 
     themeDebugLog() << "<> Initializing System Widget Themes";
     QStringList styles = QStyleFactory::keys();

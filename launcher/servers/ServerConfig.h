@@ -33,6 +33,7 @@ struct ServerConfig {
     bool eulaAccepted = false;
     int rconPort = 0;         // 0 = not assigned yet
     QString rconPassword;     // generated on first start
+    QString publicAddress;    // address shown to players (domain or IP, optional :port); empty = detect automatically
 
     /** Best guess of the required Java major version, used until the real value is read from Mojang's manifest. */
     static int guessJavaMajor(const QString& minecraftVersion);

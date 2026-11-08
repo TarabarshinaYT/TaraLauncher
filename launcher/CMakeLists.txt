@@ -25,6 +25,8 @@ set(CORE_SOURCES
     servers/ServerInstaller.cpp
     servers/ServerManager.h
     servers/ServerManager.cpp
+    servers/ServerNetwork.h
+    servers/ServerNetwork.cpp
     servers/ServerNotifier.h
     servers/ServerNotifier.cpp
     servers/ServerProcess.h
@@ -888,6 +890,8 @@ SET(LAUNCHER_SOURCES
     ui/themes/SystemTheme.h
     ui/themes/IconTheme.cpp
     ui/themes/IconTheme.h
+    ui/themes/TaraThemes.cpp
+    ui/themes/TaraThemes.h
     ui/themes/ThemeManager.cpp
     ui/themes/ThemeManager.h
     ui/themes/CatPack.cpp
@@ -962,6 +966,10 @@ SET(LAUNCHER_SOURCES
     ui/pages/global/LauncherPage.cpp
     ui/pages/global/LauncherPage.h
     ui/pages/global/AppearancePage.h
+    ui/pages/global/TaraAppearancePage.cpp
+    ui/pages/global/TaraAppearancePage.h
+    ui/TaraAppearance.cpp
+    ui/TaraAppearance.h
     ui/pages/global/ProxyPage.cpp
     ui/pages/global/ProxyPage.h
     ui/pages/global/APIPage.cpp
@@ -1093,6 +1101,8 @@ SET(LAUNCHER_SOURCES
     ui/dialogs/ServerSettingsDialog.h
     ui/widgets/HelpIcon.cpp
     ui/widgets/HelpIcon.h
+    ui/widgets/ConnectionTab.cpp
+    ui/widgets/ConnectionTab.h
     ui/widgets/MapTab.cpp
     ui/widgets/MapTab.h
     ui/widgets/MotdPreview.cpp
@@ -1266,6 +1276,11 @@ if(${Launcher_USE_PCH})
         include/qtcore.pch.hpp
         include/qtgui.pch.hpp
     )
+endif()
+
+if(WIN32)
+    # IShellLink (desktop shortcut with a custom icon) lives in these libraries
+    target_link_libraries(Launcher_logic ole32 shell32 uuid)
 endif()
 
 ####### Targets ########
