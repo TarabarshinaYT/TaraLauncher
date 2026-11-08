@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 #include "ServersWindow.h"
 
+#include <QFile>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -14,6 +15,7 @@
 #include "DesktopServices.h"
 #include "HardwareInfo.h"
 #include "servers/ServerInstaller.h"
+#include "servers/ServerJavaTask.h"
 #include "servers/ServerManager.h"
 #include "ui/dialogs/NewServerDialog.h"
 #include "ui/dialogs/ProgressDialog.h"
@@ -193,6 +195,7 @@ void ServersWindow::createServer()
     ServerInstaller* raw = installer.get();
     ProgressDialog progress(this);
     const int result = progress.execWithTask(installer.get());
+    const ServerConfig resultConfig = raw->resultConfig();
     if (result != QDialog::Accepted) {
         const QString reason = raw->failReason();
         QString removeError;
@@ -202,6 +205,13 @@ void ServersWindow::createServer()
         }
         return;
     }
+    // remember what the installer learned (loader build, required Java version)
+    QString saveError;
+    ServerConfig installed = server->config();
+    installed.loaderVersion = resultConfig.loaderVersion;
+    installed.javaMajor = resultConfig.javaMajor;
+    m_manager->saveConfig(server->config().id, installed, &saveError);
+    refreshItem(server);
     if (auto* item = itemFor(server->config().id)) {
         m_list->setCurrentItem(item);
     }
@@ -222,9 +232,36 @@ void ServersWindow::startSelected()
             return;
         }
     }
+    if (!ensureJava(s)) {
+        return;
+    }
     m_console->clear();
     s->start();
     updateButtons();
+}
+
+bool ServersWindow::ensureJava(ServerProcess* s)
+{
+    // a Java chosen by the user (or found earlier) that still exists is used as it is
+    if (!s->config().javaPath.isEmpty() && QFile::exists(s->config().javaPath)) {
+        return true;
+    }
+    auto task = std::make_unique<ServerJavaTask>(s->config().requiredJavaMajor());
+    ServerJavaTask* raw = task.get();
+    ProgressDialog progress(this);
+    const int result = progress.execWithTask(task.get());
+    if (result != QDialog::Accepted) {
+        const QString reason = raw->failReason();
+        if (!reason.isEmpty()) {
+            QMessageBox::warning(this, tr("Java"), tr("Не удалось подготовить Java %1: %2").arg(s->config().requiredJavaMajor()).arg(reason));
+        }
+        return false;
+    }
+    ServerConfig updated = s->config();
+    updated.javaPath = raw->javaPath();
+    QString error;
+    m_manager->saveConfig(updated.id, updated, &error);
+    return true;
 }
 
 void ServersWindow::stopSelected()

@@ -116,7 +116,10 @@ bool ServerConfig::load(const QString& dir)
     port = o.value("port").toInt(25565);
     memoryMb = o.value("memoryMb").toInt(2048);
     javaPath = o.value("javaPath").toString();
+    javaMajor = o.value("javaMajor").toInt(0);
     eulaAccepted = o.value("eulaAccepted").toBool(false);
+    rconPort = o.value("rconPort").toInt(0);
+    rconPassword = o.value("rconPassword").toString();
     extraJvmArgs.clear();
     for (const auto& v : o.value("extraJvmArgs").toArray()) {
         extraJvmArgs << v.toString();
@@ -139,7 +142,10 @@ bool ServerConfig::save(const QString& dir) const
     o["port"] = port;
     o["memoryMb"] = memoryMb;
     o["javaPath"] = javaPath;
+    o["javaMajor"] = javaMajor;
     o["eulaAccepted"] = eulaAccepted;
+    o["rconPort"] = rconPort;
+    o["rconPassword"] = rconPassword;
     o["extraJvmArgs"] = QJsonArray::fromStringList(extraJvmArgs);
     o["launchArgs"] = QJsonArray::fromStringList(launchArgs);
 

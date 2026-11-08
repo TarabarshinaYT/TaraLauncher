@@ -27,12 +27,16 @@ struct ServerConfig {
     int port = 25565;
     int memoryMb = 2048;
     QString javaPath;         // empty = pick automatically
+    int javaMajor = 0;        // required Java major version, 0 = guess from the Minecraft version
     QStringList extraJvmArgs;
     QStringList launchArgs;   // arguments after JVM flags, e.g. {"-jar", "server.jar", "nogui"}
     bool eulaAccepted = false;
+    int rconPort = 0;         // 0 = not assigned yet
+    QString rconPassword;     // generated on first start
 
     /** Best guess of the required Java major version, used until the real value is read from Mojang's manifest. */
     static int guessJavaMajor(const QString& minecraftVersion);
+    int requiredJavaMajor() const { return javaMajor > 0 ? javaMajor : guessJavaMajor(minecraftVersion); }
 
     bool load(const QString& dir);
     bool save(const QString& dir) const;

@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /*
  *  TaraLauncher - Minecraft Launcher
- *  Server component: one running (or stopped) Minecraft server process
+ *  Server component: one Minecraft server that runs independently of the launcher.
+ *
+ *  The server is started as a detached process, so closing the launcher never stops it.
+ *  The console is read from logs/latest.log, commands and "stop" go through RCON, and the
+ *  process id is stored in tara-server.pid so a restarted launcher finds the server again.
  */
 #pragma once
 
+#include <QElapsedTimer>
 #include <QObject>
-#include <QPointer>
 #include <QTimer>
 
-#include "LoggedProcess.h"
 #include "ServerConfig.h"
 
 class ServerProcess : public QObject {
@@ -19,7 +22,7 @@ class ServerProcess : public QObject {
     Q_ENUM(Status)
 
     ServerProcess(const ServerConfig& config, const QString& directory, QObject* parent = nullptr);
-    ~ServerProcess() override;
+    ~ServerProcess() override = default;  // deliberately does NOT stop the server
 
     const ServerConfig& config() const { return m_config; }
     void setConfig(const ServerConfig& config) { m_config = config; }
@@ -29,13 +32,14 @@ class ServerProcess : public QObject {
 
     /** Starts the server. Returns false (and emits `failed`) if it cannot be started. */
     bool start();
-    /** Graceful stop: sends "stop" to the console, force-kills after the timeout. */
+    /** Graceful stop through RCON ("stop"); force-kills after 30 seconds if the server does not exit. */
     void stop();
+    /** Immediately kills the server process. May lose the last minutes of the world. */
     void kill();
-    /** Sends a console command (without trailing newline). */
+    /** Runs a console command through RCON. */
     void sendCommand(const QString& command);
 
-    /** Full console log since the last start. */
+    /** Console text of the current run (or the tail of the log after reattaching). */
     const QStringList& logLines() const { return m_log; }
 
    signals:
@@ -44,19 +48,26 @@ class ServerProcess : public QObject {
     void failed(const QString& reason);
 
    private slots:
-    void onLog(QStringList lines, MessageLevel level);
-    void onProcessState(LoggedProcess::State state);
-    void onStopTimeout();
+    void poll();
 
    private:
     void setStatus(Status status);
+    void appendLines(const QStringList& lines);
+    void readNewLog();
+    bool ensureRcon(QString* error);
     QString resolveJava() const;
     QStringList buildArguments() const;
+    QString pidFilePath() const;
+    QString logFilePath() const;
+    void writePidFile() const;
 
     ServerConfig m_config;
     QString m_directory;
     Status m_status = Status::Stopped;
-    QPointer<LoggedProcess> m_process;
-    QTimer m_stopTimer;
+    qint64 m_pid = 0;
+    qint64 m_logOffset = 0;
+    bool m_stopRequested = false;
+    QElapsedTimer m_stopClock;
+    QTimer m_poll;
     QStringList m_log;
 };

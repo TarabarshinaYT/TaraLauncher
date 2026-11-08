@@ -23,6 +23,8 @@ class ServerInstaller : public Task {
     ServerInstaller(const ServerConfig& config, const QString& directory, QObject* parent = nullptr);
 
     static bool isSupported(ServerType type);
+    /** Config with the data learned while installing (loader build, required Java). */
+    const ServerConfig& resultConfig() const { return m_config; }
 
    protected:
     void executeTask() override;

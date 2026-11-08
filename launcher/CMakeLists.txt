@@ -9,9 +9,13 @@ set(CORE_SOURCES
     # TaraLauncher - local Minecraft servers
     servers/PortAllocator.h
     servers/PortAllocator.cpp
+    servers/RconClient.h
+    servers/RconClient.cpp
     servers/ServerConfig.h
     servers/ServerConfig.cpp
     servers/ServerInstaller.h
+    servers/ServerJavaTask.h
+    servers/ServerJavaTask.cpp
     servers/ServerInstaller.cpp
     servers/ServerManager.h
     servers/ServerManager.cpp

@@ -79,7 +79,9 @@ void ServerInstaller::resolveVanilla()
             return;
         }
         fetchAll({ versionJson }, [this](const QList<QByteArray>& bodies2) {
-            const auto server = QJsonDocument::fromJson(bodies2.value(0)).object().value("downloads").toObject().value("server").toObject();
+            const auto versionObject = QJsonDocument::fromJson(bodies2.value(0)).object();
+            m_config.javaMajor = versionObject.value("javaVersion").toObject().value("majorVersion").toInt(0);
+            const auto server = versionObject.value("downloads").toObject().value("server").toObject();
             const QUrl url(server.value("url").toString());
             if (!url.isValid() || url.isEmpty()) {
                 emitFailed(tr("У версии %1 нет серверного файла.").arg(m_config.minecraftVersion));

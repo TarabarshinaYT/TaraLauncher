@@ -38,6 +38,7 @@ class ServersWindow : public QWidget {
     QListWidgetItem* itemFor(const QString& id) const;
     void addItem(ServerProcess* server);
     void updateButtons();
+    bool ensureJava(ServerProcess* server);
     static QString statusText(ServerProcess::Status status);
 
     ServerManager* m_manager = nullptr;
