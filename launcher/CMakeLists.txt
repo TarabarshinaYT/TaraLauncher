@@ -1282,15 +1282,15 @@ if(${Launcher_USE_PCH})
     )
 endif()
 
-if(WIN32)
-    # IShellLink (desktop shortcut with a custom icon) lives in these libraries
-    target_link_libraries(Launcher_logic ole32 shell32 uuid)
-endif()
-
 ####### Targets ########
 
 # Add executable
 add_library(Launcher_logic STATIC ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${LAUNCHER_RESOURCES})
+
+if(WIN32)
+    # IShellLink (desktop shortcut with a custom icon) lives in these libraries
+    target_link_libraries(Launcher_logic ole32 shell32 uuid)
+endif()
 target_include_directories(Launcher_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(Launcher_logic PUBLIC LAUNCHER_APPLICATION)
 
