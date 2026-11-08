@@ -263,6 +263,14 @@ void ServerProcess::sendCommand(const QString& command)
     }
 }
 
+bool ServerProcess::query(const QString& command, QString* reply)
+{
+    if (m_status != Status::Running) {
+        return false;
+    }
+    return Rcon::send(m_config.rconPort, m_config.rconPassword, command, reply, nullptr);
+}
+
 void ServerProcess::appendLines(const QStringList& lines)
 {
     if (lines.isEmpty()) {

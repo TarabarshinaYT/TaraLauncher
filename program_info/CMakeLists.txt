@@ -14,7 +14,8 @@ set(Launcher_AppID "org.prismlauncher.PrismLauncher")
 set(Launcher_Domain "prismlauncher.org")
 set(Launcher_Git "https://github.com/TarabarshinaYT/TaraLauncher")
 
-set(Launcher_Name "${Launcher_CommonName}" PARENT_SCOPE)
+# own name => own data folder (%APPDATA%\TaraLauncher) and own single-instance lock, so it never mixes with an installed Prism
+set(Launcher_Name "TaraLauncher" PARENT_SCOPE)
 set(Launcher_DisplayName "${Launcher_DisplayName}" PARENT_SCOPE)
 set(Launcher_ENVName "PRISMLAUNCHER" PARENT_SCOPE)
 set(Launcher_Domain "${Launcher_Domain}" PARENT_SCOPE)

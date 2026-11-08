@@ -39,6 +39,8 @@ class ServerProcess : public QObject {
     void kill();
     /** Runs a console command through RCON. */
     void sendCommand(const QString& command);
+    /** Runs a command through RCON and returns the answer without writing anything to the console. */
+    bool query(const QString& command, QString* reply);
 
     /** Console text of the current run (or the tail of the log after reattaching). */
     const QStringList& logLines() const { return m_log; }

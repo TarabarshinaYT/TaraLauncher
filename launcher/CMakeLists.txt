@@ -7,6 +7,10 @@ project(application)
 set(CORE_SOURCES
     # LOGIC - Base classes and infrastructure
     # TaraLauncher - local Minecraft servers
+    servers/world/Nbt.cpp
+    servers/world/Nbt.h
+    servers/world/WorldData.cpp
+    servers/world/WorldData.h
     servers/PlayerHistory.h
     servers/PlayerHistory.cpp
     servers/PortAllocator.h
@@ -1089,11 +1093,15 @@ SET(LAUNCHER_SOURCES
     ui/dialogs/ServerSettingsDialog.h
     ui/widgets/HelpIcon.cpp
     ui/widgets/HelpIcon.h
+    ui/widgets/MapTab.cpp
+    ui/widgets/MapTab.h
     ui/widgets/MotdPreview.cpp
     ui/widgets/PlayersTab.cpp
     ui/widgets/PlayersTab.h
     ui/widgets/MotdPreview.h
     ui/widgets/ServerPropertiesEditor.cpp
+    ui/widgets/WorldMapView.cpp
+    ui/widgets/WorldMapView.h
     ui/widgets/ServerPropertiesEditor.h
     ui/dialogs/NewsDialog.cpp
     ui/dialogs/NewsDialog.h
