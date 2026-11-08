@@ -18,7 +18,9 @@
 
 #include "servers/ServerManager.h"
 #include "ui/widgets/ConnectionTab.h"
+#include "ui/widgets/ContentTab.h"
 #include "ui/widgets/HelpIcon.h"
+#include "ui/widgets/WorldTab.h"
 #include "ui/widgets/MapTab.h"
 #include "ui/widgets/PlayersTab.h"
 #include "ui/widgets/ServerPropertiesEditor.h"
@@ -40,6 +42,8 @@ ServerSettingsDialog::ServerSettingsDialog(ServerManager* manager, ServerProcess
     m_tabs->addTab(m_properties, tr("server.properties"));
     m_connection = new ConnectionTab(server, this);
     m_tabs->addTab(m_connection, tr("Подключение"));
+    m_tabs->addTab(new ContentTab(server, this), serverTypeUsesPlugins(server->config().type) ? tr("Плагины") : tr("Моды"));
+    m_tabs->addTab(new WorldTab(server, this), tr("Мир"));
     m_tabs->addTab(new PlayersTab(server, this), tr("Игроки"));
     m_tabs->addTab(new MapTab(server, this), tr("Карта"));
 

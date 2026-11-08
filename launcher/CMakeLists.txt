@@ -1102,6 +1102,10 @@ SET(LAUNCHER_SOURCES
     ui/widgets/HelpIcon.cpp
     ui/widgets/HelpIcon.h
     ui/widgets/ConnectionTab.cpp
+    ui/widgets/ContentTab.cpp
+    ui/widgets/ContentTab.h
+    ui/widgets/WorldTab.cpp
+    ui/widgets/WorldTab.h
     ui/widgets/ConnectionTab.h
     ui/widgets/MapTab.cpp
     ui/widgets/MapTab.h
