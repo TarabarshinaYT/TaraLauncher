@@ -6,6 +6,7 @@
 
 #include "Application.h"
 #include "ServerManager.h"
+#include "settings/SettingsObject.h"
 
 namespace {
 bool flag(const char* key)

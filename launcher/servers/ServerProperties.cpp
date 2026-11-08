@@ -176,7 +176,7 @@ QString ServerProperties::encodeEscapes(const QString& text)
         } else if (c == '\n') {
             out.append(QStringLiteral("\\n"));
         } else if (c.unicode() > 126 || c.unicode() < 32) {
-            out.append(QStringLiteral("\\u%1").arg(c.unicode(), 4, 16, QLatin1Char('0')).toLower());
+            out.append(QStringLiteral("\\u%1").arg(static_cast<uint>(c.unicode()), 4, 16, QChar('0')).toLower());
         } else {
             out.append(c);
         }

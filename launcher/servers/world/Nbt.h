@@ -17,7 +17,7 @@ namespace Nbt {
  */
 QVariant parse(const QByteArray& data);
 
-/** Reads a gzip-compressed .dat file (level.dat, playerdata/*.dat). Invalid QVariant on any error. */
+/** Reads a gzip-compressed .dat file (level.dat and the files in playerdata). Invalid QVariant on any error. */
 QVariant readGzipFile(const QString& path);
 
 }  // namespace Nbt
