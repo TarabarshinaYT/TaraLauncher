@@ -29,6 +29,8 @@
 
 namespace {
 
+QIcon g_icon;  // the selected application icon, applied to every window that gets shown
+
 // ------------------------------------------------------------------ background
 
 class BackgroundPainter : public QObject {
@@ -128,7 +130,6 @@ class BackgroundPainter : public QObject {
 };
 
 BackgroundPainter* g_background = nullptr;
-QIcon g_icon;  // the selected application icon, applied to every window that gets shown
 
 // ------------------------------------------------------------------ icon presets
 

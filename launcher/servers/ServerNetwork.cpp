@@ -319,7 +319,7 @@ void UpnpClient::runAction()
     };
 
     // some routers accept only permanent rules (lease 0), others only timed ones: try both
-    addMapping(0, [this, addMapping, tag](bool ok, const QByteArray&) {
+    addMapping(0, [this, addMapping](bool ok, const QByteArray&) {
         auto afterMapping = [this](bool mapped) {
             if (!mapped) {
                 finish(false, tr("Роутер отказался открыть порт. Проверьте, что UPnP включён в настройках роутера, или откройте порт вручную."));
